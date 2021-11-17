@@ -10,6 +10,8 @@ const playerOne = {
   attak: function (name) {
     console.log(`${name} + Fight...`);
   },
+  changeHp: changeHp,
+  renderHP: renderHP
 };
 
 const playerTwo = {
@@ -21,6 +23,8 @@ const playerTwo = {
   attak: function (name) {
     console.log(`${name} + Fight...`);
   },
+  changeHp: changeHp,
+  renderHP: renderHP
 };
 
 function createElement(tag, className) {
@@ -55,38 +59,56 @@ function createPlayer(playerObj) {
 
 function playerWins(name) {
   const $winsTitle = createElement("div", "loseTitle");
-  $winsTitle.innerText = `${name} wins`;
+  $winsTitle.innerText = name ? `${name} wins` : "draw";
   return $winsTitle;
 }
 
-function randomChangeHp() {
-  return Math.ceil(Math.random() * 20);
+function randomChangeHp(num) {
+  return Math.ceil(Math.random() * num);
 }
 
-function changeHp(player) {
-  const $playerLife = document.querySelector(`.player${player.player} .life`);
-  player.hp -= randomChangeHp();
-  if (player.hp <= 0) {
-    player.hp = 0;
+function changeHp (num) {
+  this.hp -= num;
+  if (this.hp <= 0) {
+    this.hp = 0;
   }
-  $playerLife.style.width = `${player.hp}%`;
 }
 
-function clickButton() {
-  if (playerOne.hp > 0 && playerTwo.hp > 0) {
-    changeHp(playerTwo, playerOne.name);
-  }
-  if (playerOne.hp > 0 && playerTwo.hp > 0) {
-    changeHp(playerOne, playerTwo.name);
-  }
-  if (playerOne.hp <= 0) {
-    $randomButton.disabled = true;
+function elHp() {
+  return  document.querySelector(`.player${this.player} .life`);
+}
+
+function renderHP() {
+  elHp.bind(this)().style.width = `${this.hp}%`
+}
+
+function clickButton()  {
+  playerOne.changeHp(randomChangeHp(20));
+  playerTwo.changeHp(randomChangeHp(20));
+  playerOne.renderHP();
+  playerTwo.renderHP();
+
+  if (playerOne.hp === 0 && playerOne.hp < playerTwo.hp) {
     $divArenas.appendChild(playerWins(playerTwo.name));
-  }
-  if (playerTwo.hp <= 0) {
-    $randomButton.disabled = true;
+  }else if (playerTwo.hp === 0 && playerTwo.hp < playerOne.hp){
     $divArenas.appendChild(playerWins(playerOne.name));
+  }else if (playerOne.hp === 0 && playerTwo.hp === 0){
+    $divArenas.appendChild(playerWins());
   }
+  if (playerOne.hp === 0 || playerTwo.hp === 0){
+    $randomButton.disabled = true;
+    $divArenas.appendChild(createReloadButton());
+    $randomButton.style.visibility = "hidden";
+  }
+}
+
+function createReloadButton() {
+  const $divReloadWrap = createElement("div", "reloadWrap");
+  const $buttonReload = createElement("button", "button");
+  $buttonReload.innerText = "Reload"
+  $buttonReload.addEventListener("click", () => window.location.reload());
+  $divReloadWrap.appendChild($buttonReload);
+  return $divReloadWrap;
 }
 
 $randomButton.addEventListener("click", clickButton);
