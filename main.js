@@ -1,5 +1,11 @@
 const $divArenas = document.querySelector(".arenas");
-const $randomButton = document.querySelector(".button");
+const $formFight = document.querySelector(".control");
+const HIT = {
+  head: 30,
+  body: 25,
+  foot: 20,
+};
+const ATTACK = ["head", "body", "foot"];
 
 const playerOne = {
   player: 1,
@@ -10,8 +16,9 @@ const playerOne = {
   attak: function (name) {
     console.log(`${name} + Fight...`);
   },
-  changeHp: changeHp,
-  renderHP: renderHP
+  changeHp,
+  renderHP,
+  elHp,
 };
 
 const playerTwo = {
@@ -23,8 +30,9 @@ const playerTwo = {
   attak: function (name) {
     console.log(`${name} + Fight...`);
   },
-  changeHp: changeHp,
-  renderHP: renderHP
+  changeHp,
+  renderHP,
+  elHp,
 };
 
 function createElement(tag, className) {
@@ -63,11 +71,11 @@ function playerWins(name) {
   return $winsTitle;
 }
 
-function randomChangeHp(num) {
+function getRandom(num) {
   return Math.ceil(Math.random() * num);
 }
 
-function changeHp (num) {
+function changeHp(num) {
   this.hp -= num;
   if (this.hp <= 0) {
     this.hp = 0;
@@ -75,43 +83,76 @@ function changeHp (num) {
 }
 
 function elHp() {
-  return  document.querySelector(`.player${this.player} .life`);
+  return document.querySelector(`.player${this.player} .life`);
 }
 
 function renderHP() {
-  elHp.bind(this)().style.width = `${this.hp}%`
-}
-
-function clickButton()  {
-  playerOne.changeHp(randomChangeHp(20));
-  playerTwo.changeHp(randomChangeHp(20));
-  playerOne.renderHP();
-  playerTwo.renderHP();
-
-  if (playerOne.hp === 0 && playerOne.hp < playerTwo.hp) {
-    $divArenas.appendChild(playerWins(playerTwo.name));
-  }else if (playerTwo.hp === 0 && playerTwo.hp < playerOne.hp){
-    $divArenas.appendChild(playerWins(playerOne.name));
-  }else if (playerOne.hp === 0 && playerTwo.hp === 0){
-    $divArenas.appendChild(playerWins());
-  }
-  if (playerOne.hp === 0 || playerTwo.hp === 0){
-    $randomButton.disabled = true;
-    $divArenas.appendChild(createReloadButton());
-    $randomButton.style.visibility = "hidden";
-  }
+  this.elHp().style.width = `${this.hp}%`;
 }
 
 function createReloadButton() {
   const $divReloadWrap = createElement("div", "reloadWrap");
   const $buttonReload = createElement("button", "button");
-  $buttonReload.innerText = "Reload"
+  $buttonReload.innerText = "Reload";
   $buttonReload.addEventListener("click", () => window.location.reload());
   $divReloadWrap.appendChild($buttonReload);
-  return $divReloadWrap;
+  $divArenas.appendChild($divReloadWrap);
 }
-
-$randomButton.addEventListener("click", clickButton);
 
 $divArenas.appendChild(createPlayer(playerOne));
 $divArenas.appendChild(createPlayer(playerTwo));
+
+function enemyAttack() {
+  const hit = ATTACK[getRandom(3) - 1];
+  const defence = ATTACK[getRandom(3) - 1];
+
+  return {
+    value: getRandom(HIT[hit]),
+    hit,
+    defence,
+  };
+}
+
+function playerAttack() {
+  const attack = {};
+  for (let item of $formFight) {
+    if (item.checked && item.name === "hit") {
+      attack.value = getRandom(HIT[item.value]);
+      attack.hit = item.value;
+    }
+    if (item.checked && item.name === "defence") {
+      attack.defence = item.value;
+    }
+    item.checked = false;
+  }
+  return attack;
+}
+
+function checkWins(playerOne, playerTwo) {
+  if (playerOne.hp === 0 && playerOne.hp < playerTwo.hp) {
+    $divArenas.appendChild(playerWins(playerTwo.name));
+  } else if (playerTwo.hp === 0 && playerTwo.hp < playerOne.hp) {
+    $divArenas.appendChild(playerWins(playerOne.name));
+  } else if (playerOne.hp === 0 && playerTwo.hp === 0) {
+    $divArenas.appendChild(playerWins());
+  }
+  if (playerOne.hp === 0 || playerTwo.hp === 0) {
+    createReloadButton();
+  }
+}
+
+$formFight.addEventListener("submit", function (e) {
+  e.preventDefault();
+  const enemy = enemyAttack();
+  const attack = playerAttack();
+
+  if (attack.defence !== enemy.hit) {
+    playerOne.changeHp(enemy.value);
+    playerOne.renderHP();
+  }
+  if (attack.hit !== enemy.defence) {
+    playerTwo.changeHp(attack.value);
+    playerTwo.renderHP();
+  }
+  checkWins(playerOne, playerTwo);
+});
