@@ -1,3 +1,6 @@
+import { addLogs } from "./domUtils.js";
+import { getRandom, getTime } from "./utils.js";
+
 const logs = {
   start:
     "Часы показывали [time], когда [player1] и [player2] бросили вызов друг другу.",
@@ -37,4 +40,37 @@ const logs = {
     "[playerKick] обманулся и жестокий [playerDefence] блокировал удар стопой в солнечное сплетение.",
   ],
   draw: "Ничья - это тоже победа!",
+};
+
+export const generateLogs = (type, player1, player2, hit) => {
+  const { hp: hpPlayer1, name: namePlayer1 } = player1;
+  const { name: namePlayer2 } = player2;
+  let text = "";
+  switch (type) {
+    case "start":
+      text = logs[type]
+        .replace("[time]", `${getTime()}`)
+        .replace("[player1]", namePlayer1)
+        .replace("[player2]", namePlayer2);
+      break;
+    case "hit":
+      text = `${getTime()} - ${logs[type][getRandom(logs[type].length - 1)]
+        .replace("[playerDefence]", namePlayer1)
+        .replace("[playerKick]", namePlayer2)} - ${hit} [${hpPlayer1}/100]`;
+      break;
+    case "defence":
+      text = `${getTime()} - ${logs[type][getRandom(logs[type].length - 1)]
+        .replace("[playerDefence]", namePlayer2)
+        .replace("[playerKick]", namePlayer1)}`;
+      break;
+    case "draw":
+      text = `Ничья - это тоже победа!`;
+      break;
+    case "end":
+      text = logs[type][getRandom(logs[type].length - 1)]
+        .replace("[playerWins]", namePlayer1)
+        .replace("[playerLose]", namePlayer2);
+      break;
+  }
+  addLogs(text);
 };
