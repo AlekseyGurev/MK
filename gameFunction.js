@@ -17,13 +17,6 @@ export const playerAttack = () => {
   return attack;
 };
 
-export function changeHp(num) {
-  this.hp -= num;
-  if (this.hp <= 0) {
-    this.hp = 0;
-  }
-}
-
 export const enemyAttack = () => {
   const hit = ATTACK[getRandom(3) - 1];
   const defence = ATTACK[getRandom(3) - 1];
