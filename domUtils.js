@@ -41,14 +41,6 @@ export const addLogs = (text) => {
   $chat.insertAdjacentHTML("afterbegin", el);
 };
 
-export function elHp() {
-  return document.querySelector(`.player${this.player} .life`);
-}
-
-export function renderHP() {
-  this.elHp().style.width = `${this.hp}%`;
-}
-
 const createElement = (tag, className) => {
   const $tag = document.createElement(tag);
   if (className) {
