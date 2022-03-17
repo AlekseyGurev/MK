@@ -1,4 +1,4 @@
-import { HIT, ATTACK, $formFight, $divArenas, getRandom } from "./utils.js";
+import { $formFight, $divArenas } from "./utils.js";
 import { generateLogs } from "./logs.js";
 import { createReloadButton, playerWins } from "./domUtils.js";
 
@@ -6,7 +6,6 @@ export const playerAttack = () => {
   const attack = {};
   for (let item of $formFight) {
     if (item.checked && item.name === "hit") {
-      attack.value = getRandom(HIT[item.value]);
       attack.hit = item.value;
     }
     if (item.checked && item.name === "defence") {
@@ -15,17 +14,6 @@ export const playerAttack = () => {
     item.checked = false;
   }
   return attack;
-};
-
-export const enemyAttack = () => {
-  const hit = ATTACK[getRandom(3) - 1];
-  const defence = ATTACK[getRandom(3) - 1];
-
-  return {
-    value: getRandom(HIT[hit]),
-    hit,
-    defence,
-  };
 };
 
 export const checkWins = (playerOne, playerTwo) => {

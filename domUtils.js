@@ -31,7 +31,10 @@ export const createReloadButton = () => {
   const $divReloadWrap = createElement("div", "reloadWrap");
   const $buttonReload = createElement("button", "button");
   $buttonReload.innerText = "Reload";
-  $buttonReload.addEventListener("click", () => window.location.reload());
+  $buttonReload.addEventListener(
+    "click",
+    () => (window.location.pathname = "./SelectPlayers/index.html")
+  );
   $divReloadWrap.appendChild($buttonReload);
   $divArenas.appendChild($divReloadWrap);
 };
